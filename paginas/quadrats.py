@@ -16,6 +16,7 @@ st.caption(
     "Células sem PSR e sem a referência ficam sem cor (só o fundo de satélite). População residente: células com ao menos um morador. "
     "Para não revelar a localização exata das cenas, o mapa mostra apenas as células.  \n"
     "**Fonte:** Elaboração própria a partir do censo de PSR de 2024 (IPP), das cenas de uso registradas no censo, "
-    "da Grade Estatística do Censo 2022 (IBGE), do OpenStreetMap (via NextGIS Data) e da camada Limite de Bairros (DATA.RIO), "
+    "da Grade Estatística do Censo 2022 (IBGE), dos pontos de parada do SPPO (DATA.RIO; pontos de ônibus), do OpenStreetMap "
+    "(via NextGIS Data; trem, metrô e VLT) e da camada Limite de Bairros (DATA.RIO), "
     "sobre imagem de satélite do Google em tons de cinza."
 )

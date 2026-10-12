@@ -16,6 +16,7 @@ st.caption(
     "Dissimilaridade local: diferença, em pontos percentuais, entre a fatia da PSR e a fatia da referência em cada "
     "célula. A área do círculo é proporcional ao valor absoluto da diferença, na mesma escala em todos os mapas.  \n"
     "**Fonte:** Elaboração própria a partir do censo de PSR de 2024 (IPP), das cenas de uso registradas no censo, "
-    "da Grade Estatística do Censo 2022 (IBGE) e do OpenStreetMap (via NextGIS Data), sobre imagem de satélite do Google "
+    "da Grade Estatística do Censo 2022 (IBGE), dos pontos de parada do SPPO (DATA.RIO; pontos de ônibus) e do OpenStreetMap "
+    "(via NextGIS Data; trem, metrô e VLT), sobre imagem de satélite do Google "
     "em tons de cinza."
 )
