@@ -11,10 +11,11 @@ st.title("Índice de Dissimilaridade (D de Duncan) e Gráfico de Dissimilaridade
 mostrar_tabela("duncan_psr_referencias_2024", 6)
 
 st.subheader("Dissimilaridade local da PSR 2024 nas células de 1 km da Grade Estatística do IBGE")
-escolher_e_mostrar_mapa("dissimilaridade", "Referência do mapa", "referencia_dissimilaridade")
+escolher_e_mostrar_mapa("dissimilaridade", "Referência do mapa", "referencia_dissimilaridade", extensao="jpg")
 st.caption(
     "Dissimilaridade local: diferença, em pontos percentuais, entre a fatia da PSR e a fatia da referência em cada "
     "célula. A área do círculo é proporcional ao valor absoluto da diferença, na mesma escala em todos os mapas.  \n"
     "**Fonte:** Elaboração própria a partir do censo de PSR de 2024 (IPP), das cenas de uso registradas no censo, "
-    "da Grade Estatística do Censo 2022 (IBGE) e do OpenStreetMap (via NextGIS Data)."
+    "da Grade Estatística do Censo 2022 (IBGE) e do OpenStreetMap (via NextGIS Data), sobre imagem de satélite do Google "
+    "em tons de cinza."
 )

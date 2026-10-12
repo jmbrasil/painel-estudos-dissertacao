@@ -74,11 +74,11 @@ def mostrar_tabela(nome, numero):
     st.caption("  \n".join(legendas))
 
 
-def escolher_e_mostrar_mapa(prefixo, rotulo, chave):
+def escolher_e_mostrar_mapa(prefixo, rotulo, chave, extensao="png"):
     """Escolha da referência e mapa recortado da figura composta da dissertação."""
     conferir_pasta()
     referencia = st.radio(rotulo, list(REFERENCIAS_MAPAS), horizontal=True, key=chave)
     if referencia in FORA_DA_DISSERTACAO:
         st.info(AVISO_FORA)
-    st.image(caminho(f"{prefixo}_{REFERENCIAS_MAPAS[referencia]}.png"), width="stretch")
+    st.image(caminho(f"{prefixo}_{REFERENCIAS_MAPAS[referencia]}.{extensao}"), width="stretch")
     return referencia
