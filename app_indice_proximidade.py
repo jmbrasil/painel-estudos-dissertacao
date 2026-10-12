@@ -16,7 +16,18 @@ Rodar no terminal do conda (a partir da raiz do repo):
     streamlit run painel/app_indice_proximidade.py
 """
 
+import importlib
+import sys
+
 import streamlit as st
+
+# O Streamlit Community Cloud roda de novo este arquivo e as abas a cada push, mas mantém na memória os módulos já
+# importados: depois de uma mudança em resultados_comuns.py, as abas novas chamavam a versão antiga das funções
+# (TypeError em 2026-10-12). Recarregar os módulos do painel a cada execução evita isso; config_painel antes, porque
+# resultados_comuns importa dele.
+for _modulo in ("config_painel", "resultados_comuns"):
+    if _modulo in sys.modules:
+        importlib.reload(sys.modules[_modulo])
 
 st.set_page_config(page_title="PSR no Rio de Janeiro — estudos da dissertação", layout="wide")
 
