@@ -8,8 +8,6 @@ from resultados_comuns import escolher_e_mostrar_mapa, mostrar_tabela
 
 st.title("Índice de Dissimilaridade (D de Duncan) e Gráfico de Dissimilaridade Local")
 
-mostrar_tabela("duncan_psr_referencias_2024", 6)
-
 st.subheader("Dissimilaridade local da PSR 2024 nas células de 1 km da Grade Estatística do IBGE")
 escolher_e_mostrar_mapa("dissimilaridade", "Referência do mapa", "referencia_dissimilaridade", extensao="jpg")
 st.caption(
@@ -20,3 +18,5 @@ st.caption(
     "(via NextGIS Data; trem, metrô e VLT), sobre imagem de satélite do Google "
     "em tons de cinza."
 )
+
+mostrar_tabela("duncan_psr_referencias_2024", 6)

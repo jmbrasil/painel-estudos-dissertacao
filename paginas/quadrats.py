@@ -8,8 +8,6 @@ from resultados_comuns import escolher_e_mostrar_mapa, mostrar_tabela
 
 st.title("Quadrats")
 
-mostrar_tabela("quadrats_psr_referencias_2024", 4)
-
 st.subheader("Células de 1 km por presença de PSR e da referência, 2024")
 escolher_e_mostrar_mapa("quadrats", "Referência do mapa", "referencia_quadrats")
 st.caption(
@@ -20,3 +18,5 @@ st.caption(
     "(via NextGIS Data; trem, metrô e VLT) e da camada Limite de Bairros (DATA.RIO), "
     "sobre imagem de satélite do Google em tons de cinza."
 )
+
+mostrar_tabela("quadrats_psr_referencias_2024", 4)

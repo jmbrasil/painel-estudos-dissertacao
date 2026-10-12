@@ -8,8 +8,6 @@ from resultados_comuns import caminho, conferir_pasta, mostrar_tabela
 
 st.title("Agenda futura")
 
-mostrar_tabela("cenas_por_zona_2024", 7)
-
 conferir_pasta()
 st.subheader("Cenas abertas de uso de drogas em 2024 sobre mapa de grupos armados")
 st.image(caminho("cenas_sobre_mapa_fogo_cruzado.jpg"), width="stretch")
@@ -20,3 +18,5 @@ st.caption(
     "Laranja: ADA; vermelho: CV; azul: milícia; verde: TCP. Círculos brancos: cenas de uso, com a posição "
     "deslocada aleatoriamente (de 102 a 998 m) para não revelar a localização exata."
 )
+
+mostrar_tabela("cenas_por_zona_2024", 7)
