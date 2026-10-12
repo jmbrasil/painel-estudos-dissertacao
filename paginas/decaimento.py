@@ -92,7 +92,10 @@ fig.update_xaxes(range=[0, distancia_max], tickformat=",.0f", showgrid=False)
 fig.update_xaxes(title_text=f"Distância ao ponto mais próximo da referência (m), faixas de {largura} m",
                  row=len(selecionadas) if separado else None, col=1 if separado else None)
 fig.update_yaxes(title_text=titulo_y, gridcolor="#e0dfd7", rangemode="tozero")
-st.plotly_chart(fig, width="stretch")
+# fundo branco e texto escuro fixos, sem o tema do Streamlit: no modo escuro, o tema punha texto claro sobre o fundo
+# branco do gráfico e títulos, eixos e legenda sumiam (2026-10-12)
+fig.update_layout(template="plotly_white", font=dict(color="#31333F"))
+st.plotly_chart(fig, width="stretch", theme=None)
 
 st.caption(
     "Distância em linha reta de cada PSR (8.195) ao ponto mais próximo da referência. A linha pontilhada marca a "

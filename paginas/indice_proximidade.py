@@ -108,7 +108,10 @@ fig.update_layout(
     legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5),
     hovermode="closest",
 )
-st.plotly_chart(fig, width="stretch")
+# fundo branco e texto escuro fixos, sem o tema do Streamlit: no modo escuro, o tema punha texto claro sobre o fundo
+# branco do gráfico e títulos, eixos e legenda sumiam (2026-10-12)
+fig.update_layout(template="plotly_white", font=dict(color="#31333F"))
+st.plotly_chart(fig, width="stretch", theme=None)
 
 st.subheader("Valores do índice na faixa escolhida")
 tabela = (dados.pivot(index="referencia", columns="raio_m", values="indice")
