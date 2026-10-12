@@ -13,8 +13,9 @@ mostrar_tabela("quadrats_psr_referencias_2024", 4)
 st.subheader("Células de 1 km por presença de PSR e da referência, 2024")
 escolher_e_mostrar_mapa("quadrats", "Referência do mapa", "referencia_quadrats")
 st.caption(
-    "Células sem PSR e sem a referência ficam em branco. População residente: células com ao menos um morador. "
+    "Células sem PSR e sem a referência ficam sem cor (só o fundo de satélite). População residente: células com ao menos um morador. "
     "Para não revelar a localização exata das cenas, o mapa mostra apenas as células.  \n"
     "**Fonte:** Elaboração própria a partir do censo de PSR de 2024 (IPP), das cenas de uso registradas no censo, "
-    "da Grade Estatística do Censo 2022 (IBGE), do OpenStreetMap (via NextGIS Data) e da camada Limite de Bairros (DATA.RIO)."
+    "da Grade Estatística do Censo 2022 (IBGE), do OpenStreetMap (via NextGIS Data) e da camada Limite de Bairros (DATA.RIO), "
+    "sobre imagem de satélite do Google em tons de cinza."
 )

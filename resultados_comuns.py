@@ -74,7 +74,7 @@ def mostrar_tabela(nome, numero):
     st.caption("  \n".join(legendas))
 
 
-def escolher_e_mostrar_mapa(prefixo, rotulo, chave, extensao="png"):
+def escolher_e_mostrar_mapa(prefixo, rotulo, chave, extensao="jpg"):
     """Escolha da referência e mapa recortado da figura composta da dissertação."""
     conferir_pasta()
     referencia = st.radio(rotulo, list(REFERENCIAS_MAPAS), horizontal=True, key=chave)
