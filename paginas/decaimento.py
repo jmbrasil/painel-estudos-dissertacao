@@ -4,8 +4,8 @@
 paginas/decaimento.py — Aba do decaimento por distância: histograma da distância de cada PSR de 2024 ao ponto
 mais próximo de cada referência, com escolha das referências, da faixa e da distância máxima.
 
-Lê as contagens em faixas de 50 m (decaimento_faixas_50m.parquet e, para escolas e unidades de saúde, que não estão
-na dissertação, decaimento_faixas_50m_escolas_saude.parquet) e as junta nas faixas escolhidas.
+Lê as contagens em faixas de 50 m (decaimento_faixas_50m.parquet e, para as referências que não estão na dissertação,
+decaimento_faixas_50m_extras.parquet) e as junta nas faixas escolhidas.
 """
 
 import pandas as pd
@@ -18,7 +18,7 @@ from resultados_comuns import AVISO_FORA, CORES, FORA_DA_DISSERTACAO, conferir_p
 st.title("Decaimento por distância")
 conferir_pasta()
 
-faixas = pd.concat([ler("decaimento_faixas_50m.parquet"), ler("decaimento_faixas_50m_escolas_saude.parquet")])
+faixas = pd.concat([ler("decaimento_faixas_50m.parquet"), ler("decaimento_faixas_50m_extras.parquet")])
 referencias = [r for r in CORES if r in set(faixas["referencia"])]
 na_dissertacao = [r for r in referencias if r not in FORA_DA_DISSERTACAO]
 

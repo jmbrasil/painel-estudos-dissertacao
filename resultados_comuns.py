@@ -17,15 +17,17 @@ from config_painel import PASTA_PAINEL_RESULTADOS
 REFERENCIAS_MAPAS = {"Cenas de uso": "cenas_de_uso", "População residente": "populacao_residente",
                      "Pontos de ônibus": "pontos_de_onibus", "Estações de trem": "estacoes_de_trem",
                      "Estações de metrô": "estacoes_de_metro", "Paradas do VLT": "paradas_do_vlt",
-                     "Escolas": "escolas", "Unidades de saúde": "unidades_de_saude"}
-# calculadas só para o painel, com o mesmo método (pipeline_limpeza/gera_analises_escolas_saude_2024.py)
-FORA_DA_DISSERTACAO = {"Escolas", "Unidades de saúde"}
-AVISO_FORA = ("Escolas e unidades de saúde não estão na dissertação: foram calculadas só para este painel, "
-              "com o mesmo método das outras referências.")
+                     "Escolas": "escolas", "Unidades de saúde": "unidades_de_saude",
+                     "Delegacias e batalhões": "delegacias_e_batalhoes"}
+# calculadas só para o painel, com o mesmo método (pipeline_limpeza/gera_analises_referencias_extras_2024.py)
+FORA_DA_DISSERTACAO = {"Escolas", "Unidades de saúde", "Delegacias e batalhões"}
+AVISO_FORA = ("Escolas, unidades de saúde e delegacias e batalhões não estão na dissertação: foram calculadas só "
+              "para este painel, com o mesmo método das outras referências.")
 
 # mesmas cores do índice de proximidade
 CORES = {"Pontos de ônibus": "#185FA5", "Estações de trem": "#6A4C93", "Estações de metrô": "#E76F51",
-         "Paradas do VLT": "#F4A261", "Cenas de uso": "#555555", "Escolas": "#2A9D8F", "Unidades de saúde": "#B5838D"}
+         "Paradas do VLT": "#F4A261", "Cenas de uso": "#555555", "Escolas": "#2A9D8F", "Unidades de saúde": "#B5838D",
+         "Delegacias e batalhões": "#A32D2D"}
 
 
 def caminho(arquivo):
