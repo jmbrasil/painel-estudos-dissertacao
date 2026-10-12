@@ -1,12 +1,18 @@
-# Painel — índice de proximidade da PSR 2024
+# Painel — estudos da dissertação sobre a PSR no Rio de Janeiro (2024)
 
-Painel interativo do índice de proximidade da população em situação de rua (PSR) de 2024 a cenas
-abertas de uso de drogas e a equipamentos urbanos, no município do Rio de Janeiro. Parte da
-dissertação de mestrado de João Marcelo Guimarães Brasil (FGV EBAPE).
+Painel interativo com resultados da dissertação de mestrado de João Marcelo Guimarães Brasil (FGV EBAPE)
+sobre a população em situação de rua (PSR) no município do Rio de Janeiro, em abas:
 
-    índice(r) = PSR observada no raio / PSR esperada no raio sob aleatoriedade na área habitável
+- Dados do Rio de Janeiro: PSR por método de coleta, resumo do município e I de Moran;
+- Quadrats: PSR nas células de 1 km da Grade Estatística do IBGE com e sem cada referência;
+- Decaimento por distância: histograma da distância da PSR à referência mais próxima;
+- Índice de proximidade Observada sobre Esperada: PSR observada no raio / PSR esperada sob aleatoriedade
+  na área habitável (26 raios, de 100 m a 8 km);
+- Dissimilaridade (D de Duncan) e dissimilaridade local;
+- Agenda futura: cenas de uso por zona e sobre o mapa de grupos armados.
 
-O app lê `indice_proximidade_psr_equipamentos_2024.parquet`, com valores agregados por referência e raio (26 raios, de 100 m a 8 km).
+Os dados são agregados (tabelas, contagens por faixa de distância e imagens dos mapas); as cenas de uso
+aparecem só em células ou com posição deslocada.
 
 Para rodar localmente:
 
