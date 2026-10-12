@@ -4,24 +4,28 @@
 paginas/decaimento.py — Aba do decaimento por distância: histograma da distância de cada PSR de 2024 ao ponto
 mais próximo de cada referência, com escolha das referências, da faixa e da distância máxima.
 
-Lê as contagens em faixas de 50 m (decaimento_faixas_50m.parquet) e as junta nas faixas escolhidas.
+Lê as contagens em faixas de 50 m (decaimento_faixas_50m.parquet e, para escolas e unidades de saúde, que não estão
+na dissertação, decaimento_faixas_50m_escolas_saude.parquet) e as junta nas faixas escolhidas.
 """
 
+import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
-from resultados_comuns import CORES, conferir_pasta, ler, mostrar_tabela, numero_br
+from resultados_comuns import AVISO_FORA, CORES, FORA_DA_DISSERTACAO, conferir_pasta, ler, mostrar_tabela, numero_br
 
 st.title("Decaimento por distância")
 conferir_pasta()
 
-faixas = ler("decaimento_faixas_50m.parquet")
+faixas = pd.concat([ler("decaimento_faixas_50m.parquet"), ler("decaimento_faixas_50m_escolas_saude.parquet")])
 referencias = [r for r in CORES if r in set(faixas["referencia"])]
+na_dissertacao = [r for r in referencias if r not in FORA_DA_DISSERTACAO]
 
 col1, col2 = st.columns([3, 2])
 with col1:
-    selecionadas = st.multiselect("Referências", referencias, default=referencias)
+    selecionadas = st.multiselect("Referências", referencias, default=na_dissertacao,
+                                  help=AVISO_FORA)
     distancia_max = st.slider("Distância máxima no gráfico (m)", min_value=500, max_value=10_000, value=1_500, step=250)
 with col2:
     largura = st.select_slider("Largura da faixa (m)", options=[50, 100, 200, 250, 500], value=100)
@@ -79,6 +83,7 @@ st.caption(
     "Distância em linha reta de cada PSR (8.195) ao ponto mais próximo da referência. As linhas pontilhadas marcam "
     "500 m e 1 km. Fora do gráfico (acima da distância máxima): "
     + "; ".join(f"{r}: {numero_br(acima_max[r], 0)} PSR" for r in selecionadas) + "."
+    + (f" {AVISO_FORA}" if FORA_DA_DISSERTACAO & set(selecionadas) else "")
 )
 
 mostrar_tabela("decaimento_psr_referencias_2024", 5)
