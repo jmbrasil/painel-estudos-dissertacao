@@ -62,9 +62,24 @@ for i, rotulo in enumerate(selecionadas, start=1):
     else:
         fig.add_trace(barra)
 
-for d in (500, 1_000):
-    if d < distancia_max:
-        fig.add_vline(x=d, line=dict(color="#EF9F27", dash="dot", width=2))
+# uma linha na mediana de cada referência, como na figura da dissertação (pedido do usuário em 2026-10-12; antes, linhas
+# em 500 m e 1 km). A mediana vem da Tabela 5 (distância exata), não das faixas de 50 m.
+medianas = ler("tabela_decaimento_psr_referencias_2024.parquet").set_index("Referência")["Mediana (m)"]
+for k, rotulo in enumerate(selecionadas):
+    mediana = medianas[rotulo]
+    cor = "#EF9F27" if separado else CORES[rotulo]
+    alvo = dict(row=k + 1, col=1) if separado else {}
+    y_rotulo = 0.97 if separado else 0.97 - 0.07 * k  # sobrepostas: um rótulo embaixo do outro
+    texto = f"mediana{'' if separado else ' (' + rotulo + ')'}: {numero_br(mediana, 0)} m"
+    if mediana < distancia_max:
+        fig.add_vline(x=mediana, line=dict(color=cor, dash="dot", width=2), **alvo)
+        fig.add_annotation(x=mediana, y=y_rotulo, xref="x", yref="y domain", text=f"<b>{texto}</b>", showarrow=False,
+                           xanchor="left", yanchor="top", xshift=4, font=dict(color="#b36b00" if separado else cor),
+                           bgcolor="rgba(255,255,255,0.85)", **alvo)
+    else:  # mediana além da distância máxima do gráfico: rótulo com seta na borda direita
+        fig.add_annotation(x=distancia_max, y=y_rotulo, xref="x", yref="y domain", text=f"<b>{texto} →</b>",
+                           showarrow=False, xanchor="right", yanchor="top", font=dict(color="#b36b00" if separado else cor),
+                           bgcolor="rgba(255,255,255,0.85)", **alvo)
 
 titulo_y = "% da PSR" if eixo_pct else "Número de PSR"
 fig.update_layout(
@@ -80,8 +95,9 @@ fig.update_yaxes(title_text=titulo_y, gridcolor="#e0dfd7", rangemode="tozero")
 st.plotly_chart(fig, width="stretch")
 
 st.caption(
-    "Distância em linha reta de cada PSR (8.195) ao ponto mais próximo da referência. As linhas pontilhadas marcam "
-    "500 m e 1 km. Fora do gráfico (acima da distância máxima): "
+    "Distância em linha reta de cada PSR (8.195) ao ponto mais próximo da referência. A linha pontilhada marca a "
+    "mediana da distância; quando ela passa da distância máxima do gráfico, aparece só o rótulo com a seta, na borda "
+    "direita. Fora do gráfico (acima da distância máxima): "
     + "; ".join(f"{r}: {numero_br(acima_max[r], 0)} PSR" for r in selecionadas) + "."
     + (f" {AVISO_FORA}" if FORA_DA_DISSERTACAO & set(selecionadas) else "")
 )
