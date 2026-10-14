@@ -44,18 +44,14 @@ with col1:
     distancia_max = st.slider("Distância máxima no gráfico (m)", min_value=500, max_value=10_000, value=1_500, step=250)
 with col2:
     largura = st.select_slider("Largura da faixa (m)", options=[50, 100, 200, 250, 500], value=100)
-    eixo_pct = st.radio("Eixo y", ["Número de PSR", "% da PSR"], horizontal=True) == "% da PSR"
-    separado = st.radio("Exibição", ["Um painel por referência", "Sobrepostas"], horizontal=True) == "Um painel por referência"
+# sem as opções "Eixo y" (% da PSR) e "Exibição" (sobrepostas) desde 2026-10-14, a pedido do usuário: número de PSR,
+# um painel por referência, como na figura da dissertação
 
 if not selecionadas:
     st.info("Escolha ao menos uma referência.")
     st.stop()
 
-if separado:
-    fig = make_subplots(rows=len(selecionadas), cols=1, shared_xaxes=True, vertical_spacing=0.06,
-                        subplot_titles=selecionadas)
-else:
-    fig = go.Figure()
+fig = make_subplots(rows=len(selecionadas), cols=1, shared_xaxes=True, vertical_spacing=0.06, subplot_titles=selecionadas)
 
 acima_max = {}
 y_max = 0
@@ -65,52 +61,39 @@ for i, rotulo in enumerate(selecionadas, start=1):
     t = t[t["inicio_m"] < distancia_max].assign(faixa=lambda d: d["inicio_m"] // largura * largura)
     contagem = t.groupby("faixa")["n_psr"].sum()
     acima_max[rotulo] = total - contagem.sum()
-    y = 100 * contagem / total if eixo_pct else contagem
-    y_max = max(y_max, y.max() if len(y) else 0)
-    barra = go.Bar(
-        x=contagem.index + largura / 2, y=y, width=largura * 0.85, name=rotulo, marker_color=CORES[rotulo],
-        opacity=1 if separado else 0.55, showlegend=not separado,
+    y_max = max(y_max, contagem.max() if len(contagem) else 0)
+    fig.add_trace(go.Bar(
+        x=contagem.index + largura / 2, y=contagem, width=largura * 0.85, name=rotulo, marker_color=CORES[rotulo],
+        showlegend=False,
         customdata=list(zip(contagem.index, contagem.index + largura, contagem, 100 * contagem / total)),
         hovertemplate=(f"<b>{rotulo}</b><br>%{{customdata[0]:,.0f}} a %{{customdata[1]:,.0f}} m<br>"
                        "%{customdata[2]:,.0f} PSR (%{customdata[3]:.1f}% da PSR)<extra></extra>"),
-    )
-    if separado:
-        fig.add_trace(barra, row=i, col=1)
-    else:
-        fig.add_trace(barra)
+    ), row=i, col=1)
 
 # uma linha na mediana de cada referência, como na figura da dissertação (pedido do usuário em 2026-10-12; antes, linhas
 # em 500 m e 1 km). A mediana vem da Tabela 5 (distância exata), não das faixas de 50 m.
 for k, rotulo in enumerate(selecionadas):
     mediana = medianas[rotulo]
-    cor = "#EF9F27" if separado else CORES[rotulo]
-    alvo = dict(row=k + 1, col=1) if separado else {}
-    y_rotulo = 0.97 if separado else 0.97 - 0.07 * k  # sobrepostas: um rótulo embaixo do outro
-    texto = f"mediana{'' if separado else ' (' + rotulo + ')'}: {numero_br(mediana, 0)} m"
+    alvo = dict(row=k + 1, col=1)
+    texto = f"mediana: {numero_br(mediana, 0)} m"
     if mediana < distancia_max:
-        fig.add_vline(x=mediana, line=dict(color=cor, dash="dot", width=2), **alvo)
-        fig.add_annotation(x=mediana, y=y_rotulo, xref="x", yref="y domain", text=f"<b>{texto}</b>", showarrow=False,
-                           xanchor="left", yanchor="top", xshift=4, font=dict(color="#b36b00" if separado else cor),
+        fig.add_vline(x=mediana, line=dict(color="#EF9F27", dash="dot", width=2), **alvo)
+        fig.add_annotation(x=mediana, y=0.97, xref="x", yref="y domain", text=f"<b>{texto}</b>", showarrow=False,
+                           xanchor="left", yanchor="top", xshift=4, font=dict(color="#b36b00"),
                            bgcolor="rgba(255,255,255,0.85)", **alvo)
     else:  # mediana além da distância máxima do gráfico: rótulo com seta na borda direita
-        fig.add_annotation(x=distancia_max, y=y_rotulo, xref="x", yref="y domain", text=f"<b>{texto} →</b>",
-                           showarrow=False, xanchor="right", yanchor="top", font=dict(color="#b36b00" if separado else cor),
+        fig.add_annotation(x=distancia_max, y=0.97, xref="x", yref="y domain", text=f"<b>{texto} →</b>",
+                           showarrow=False, xanchor="right", yanchor="top", font=dict(color="#b36b00"),
                            bgcolor="rgba(255,255,255,0.85)", **alvo)
 
-titulo_y = "% da PSR" if eixo_pct else "Número de PSR"
-fig.update_layout(
-    barmode="overlay", separators=",.", plot_bgcolor="white", paper_bgcolor="white",
-    height=max(450, 230 * len(selecionadas)) if separado else 560,
-    legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5),
-    margin=dict(t=60 if separado else 30),
-)
+fig.update_layout(separators=",.", plot_bgcolor="white", paper_bgcolor="white",
+                  height=max(450, 230 * len(selecionadas)), margin=dict(t=60))
 fig.update_xaxes(range=[0, distancia_max], tickformat=",.0f", showgrid=False)
 fig.update_xaxes(title_text=f"Distância ao ponto mais próximo da referência (m), faixas de {largura} m",
-                 row=len(selecionadas) if separado else None, col=1 if separado else None)
-fig.update_yaxes(title_text=titulo_y, gridcolor="#e0dfd7", rangemode="tozero")
+                 row=len(selecionadas), col=1)
+fig.update_yaxes(title_text="Número de PSR", gridcolor="#e0dfd7", rangemode="tozero")
 # o mesmo eixo y em todos os painéis, até a maior barra das referências escolhidas (com a faixa e a distância máxima
-# escolhidas), em número ou em % da PSR (pedido do usuário em 2026-10-14; antes, fixo em 4.000 PSR no município e
-# automático em cada painel no eixo em %)
+# escolhidas) (pedido do usuário em 2026-10-14; antes, fixo em 4.000 PSR no município)
 fig.update_yaxes(range=[0, 1.05 * y_max])
 # fundo branco e texto escuro fixos, sem o tema do Streamlit: no modo escuro, o tema punha texto claro sobre o fundo
 # branco do gráfico e títulos, eixos e legenda sumiam (2026-10-12)
