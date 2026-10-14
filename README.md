@@ -6,8 +6,6 @@ sobre a população em situação de rua (PSR) no município do Rio de Janeiro, 
 - Dados do Rio de Janeiro: PSR por método de coleta, resumo do município e I de Moran;
 - Quadrats: PSR nas células de 1 km da Grade Estatística do IBGE com e sem cada referência;
 - Decaimento por distância: histograma da distância da PSR à referência mais próxima;
-- Índice de proximidade Observada sobre Esperada: PSR observada no raio / PSR esperada sob aleatoriedade
-  na área habitável (26 raios, de 100 m a 8 km);
 - Dissimilaridade (D de Duncan) e dissimilaridade local;
 - Agenda futura: cenas de uso por zona e sobre o mapa de grupos armados.
 
