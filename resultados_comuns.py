@@ -74,11 +74,66 @@ def mostrar_tabela(nome, numero):
     st.caption("  \n".join(legendas))
 
 
-def escolher_e_mostrar_mapa(prefixo, rotulo, chave, extensao="jpg"):
-    """Escolha da referência e mapa recortado da figura composta da dissertação."""
+def escolher_e_mostrar_mapa(prefixo, rotulo, chave, extensao="jpg", zona=None):
+    """Escolha da referência e mapa recortado da figura composta da dissertação (ou o mapa da zona escolhida)."""
     conferir_pasta()
     referencia = st.radio(rotulo, list(REFERENCIAS_MAPAS), horizontal=True, key=chave)
     if referencia in FORA_DA_DISSERTACAO:
         st.info(AVISO_FORA)
-    st.image(caminho(f"{prefixo}_{REFERENCIAS_MAPAS[referencia]}.{extensao}"), width="stretch")
+    if zona is None:
+        st.image(caminho(f"{prefixo}_{REFERENCIAS_MAPAS[referencia]}.{extensao}"), width="stretch")
+    else:
+        arquivo = caminho(f"zonas/{prefixo}_{zona['slug']}_{REFERENCIAS_MAPAS[referencia]}.jpg")
+        if os.path.exists(arquivo):
+            st.image(arquivo, width="stretch")
+        else:
+            st.info(f"{referencia}: menos de {MIN_PONTOS_ZONA} pontos {zona['em']}; o mapa e o índice não são calculados.")
     return referencia
+
+
+# ---------------------------------------------------------------- recorte por zona da cidade
+# Dados de painel/gera_dados_painel_zonas.py, em painel_resultados/zonas/ (pedido do usuário em 2026-10-14).
+RECORTES = ["Município", "Centro", "Zona Sul", "Zona Norte", "Zona Sudoeste", "Zona Oeste"]
+MIN_PONTOS_ZONA = 5
+
+
+def escolher_zona(chave):
+    """Seletor do recorte no topo da aba: o município ou uma zona. A escolha passa para as outras abas.
+
+    Devolve None para o município ou um dict com zona (código das tabelas), nome, slug e os totais da zona.
+    """
+    if not os.path.exists(caminho("zonas/resumo_zonas.parquet")):
+        st.caption("Recorte por zona indisponível: gere com `python painel/gera_dados_painel_zonas.py`.")
+        return None
+    # cada aba tem o seu widget (chave própria); a escolha fica em zona_painel para valer nas outras abas
+    atual = st.session_state.get("zona_painel", "Município")
+    nome = st.radio("Recorte", RECORTES, index=RECORTES.index(atual), horizontal=True, key=chave,
+                    help="Município: os resultados da dissertação. Zona: as mesmas análises dentro da zona, "
+                         "como no apêndice de zonas da dissertação.")
+    st.session_state["zona_painel"] = nome
+    if nome == "Município":
+        return None
+    zona = ler("zonas/resumo_zonas.parquet").set_index("nome").loc[nome].to_dict()
+    zona["nome"] = nome
+    zona["em"] = "no Centro" if nome == "Centro" else f"na {nome}"  # "no Centro", "na Zona Sul"
+    st.caption(
+        f"**{nome}:** {numero_br(zona['n_psr'], 0)} PSR, {numero_br(zona['n_cenas'], 0)} cenas de uso, "
+        f"{numero_br(zona['n_bairros'], 0)} bairros e {numero_br(zona['n_celulas'], 0)} células de 1 km (recortadas "
+        f"pelos limites da zona). {zona['descricao']}"
+        + (" Com tão poucas cenas, os resultados das cenas na zona são frágeis." if zona["n_cenas"] < 20 else "")
+    )
+    return zona
+
+
+def mostrar_tabela_zona(nome, numero, zona):
+    """Versão por zona das Tabelas 4, 5 e 6, no mesmo formato de mostrar_tabela."""
+    meta = ler("zonas/tabelas_metadados.parquet").set_index("tabela").loc[nome]
+    df = ler(f"zonas/tabela_{nome}.parquet")
+    df = df[df["zona"] == zona["zona"]].drop(columns="zona")
+    decimais = json.loads(meta["decimais"])
+    st.subheader(f"Tabela {numero} por zona – {meta['titulo'].format(zona=zona['nome'])}")
+    formatos = {col: (lambda v, d=d: numero_br(v, d)) for col, d in decimais.items()}
+    st.dataframe(df.style.format(formatos), hide_index=True, width="stretch")
+    legendas = ["Clique no nome de uma coluna para ordenar a tabela.", meta["na_dissertacao"],
+                f"**Nota:** {meta['nota']}", f"**Fonte:** {meta['fonte']}"]
+    st.caption("  \n".join(legendas))
