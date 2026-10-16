@@ -11,7 +11,7 @@ import os
 import pandas as pd
 import streamlit as st
 
-from config_painel import PASTA_PAINEL_RESULTADOS
+from config_painel import PASTA_PAINEL_RESULTADOS, URL_IMAGENS_PAINEL
 
 # referências das figuras compostas de quadrats e de dissimilaridade, na ordem da dissertação
 # Largura dos mapas na tela: com width="stretch" e a página em modo largo, o mapa ocupava a janela inteira e era preciso
@@ -21,6 +21,11 @@ FRACAO_LARGURA_MAPA = 0.6
 
 
 def mostrar_mapa(arquivo):
+    """Mostra a imagem de PASTA_PAINEL_RESULTADOS numa coluna. No painel publicado (URL_IMAGENS_PAINEL definido), a imagem
+    vem do GitHub; o ?v= (data do arquivo no app) evita que o navegador ou o GitHub mostrem uma versão antiga."""
+    if URL_IMAGENS_PAINEL:
+        relativo = os.path.relpath(arquivo, PASTA_PAINEL_RESULTADOS).replace(os.sep, "/")
+        arquivo = f"{URL_IMAGENS_PAINEL}/{relativo}?v={int(os.path.getmtime(arquivo))}"
     coluna, _ = st.columns([FRACAO_LARGURA_MAPA, 1 - FRACAO_LARGURA_MAPA])
     coluna.image(arquivo, width="stretch")
 
