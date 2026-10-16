@@ -4,13 +4,13 @@
 
 import streamlit as st
 
-from resultados_comuns import LARGURA_MAPA_PX, caminho, conferir_pasta, mostrar_tabela
+from resultados_comuns import caminho, conferir_pasta, mostrar_mapa, mostrar_tabela
 
 st.title("Agenda futura")
 
 conferir_pasta()
 st.subheader("Cenas abertas de uso de drogas em 2024 sobre mapa de grupos armados")
-st.image(caminho("cenas_sobre_mapa_fogo_cruzado.jpg"), width=LARGURA_MAPA_PX)
+mostrar_mapa(caminho("cenas_sobre_mapa_fogo_cruzado.jpg"))
 st.caption(
     "Mapa de áreas sob controle de grupos armados de 2024 "
     "([Instituto Fogo Cruzado, 2026](https://fogocruzado.org.br/mapadosgruposarmados/)). "
