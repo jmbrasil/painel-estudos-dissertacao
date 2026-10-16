@@ -14,6 +14,10 @@ import streamlit as st
 from config_painel import PASTA_PAINEL_RESULTADOS
 
 # referências das figuras compostas de quadrats e de dissimilaridade, na ordem da dissertação
+# Largura dos mapas na tela, em pixels: com width="stretch" e a página em modo largo, o mapa ocupava a janela inteira e
+# era preciso rolar para ver a imagem e a legenda (pedido do usuário em 2026-10-15).
+LARGURA_MAPA_PX = 820
+
 REFERENCIAS_MAPAS = {"Cenas de uso": "cenas_de_uso", "População residente": "populacao_residente",
                      "Pontos de ônibus": "pontos_de_onibus", "Estações de trem": "estacoes_de_trem",
                      "Estações de metrô": "estacoes_de_metro", "Paradas do VLT": "paradas_do_vlt",
@@ -81,11 +85,11 @@ def escolher_e_mostrar_mapa(prefixo, rotulo, chave, extensao="jpg", zona=None):
     if referencia in FORA_DA_DISSERTACAO:
         st.info(AVISO_FORA)
     if zona is None:
-        st.image(caminho(f"{prefixo}_{REFERENCIAS_MAPAS[referencia]}.{extensao}"), width="stretch")
+        st.image(caminho(f"{prefixo}_{REFERENCIAS_MAPAS[referencia]}.{extensao}"), width=LARGURA_MAPA_PX)
     else:
         arquivo = caminho(f"zonas/{prefixo}_{zona['slug']}_{REFERENCIAS_MAPAS[referencia]}.jpg")
         if os.path.exists(arquivo):
-            st.image(arquivo, width="stretch")
+            st.image(arquivo, width=LARGURA_MAPA_PX)
         else:
             st.info(f"{referencia}: menos de {MIN_PONTOS_ZONA} pontos {zona['em']}; o mapa e o índice não são calculados.")
     return referencia

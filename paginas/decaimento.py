@@ -37,13 +37,17 @@ else:  # PSR da zona; a distância vai até o ponto mais próximo em qualquer lu
 referencias = [r for r in CORES if r in set(faixas["referencia"])]
 na_dissertacao = [r for r in referencias if r not in FORA_DA_DISSERTACAO]
 
-col1, col2 = st.columns([3, 2])
+# os três controles numa linha, com menus em vez de sliders, para ocupar menos altura (pedido do usuário em 2026-10-14)
+col1, col2, col3 = st.columns([4, 1.3, 1.3])
 with col1:
     selecionadas = st.multiselect("Referências", referencias, default=na_dissertacao,
                                   help=AVISO_FORA)
-    distancia_max = st.slider("Distância máxima no gráfico (m)", min_value=500, max_value=10_000, value=1_500, step=250)
+DISTANCIAS = list(range(500, 10_001, 250))
 with col2:
-    largura = st.select_slider("Largura da faixa (m)", options=[50, 100, 200, 250, 500], value=100)
+    distancia_max = st.selectbox("Distância máxima", DISTANCIAS, index=DISTANCIAS.index(1_500),
+                                 format_func=lambda v: f"{numero_br(v, 0)} m")
+with col3:
+    largura = st.selectbox("Largura da faixa", [50, 100, 200, 250, 500], index=1, format_func=lambda v: f"{v} m")
 # sem as opções "Eixo y" (% da PSR) e "Exibição" (sobrepostas) desde 2026-10-14, a pedido do usuário: número de PSR,
 # um painel por referência, como na figura da dissertação
 
