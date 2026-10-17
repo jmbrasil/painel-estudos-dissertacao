@@ -10,6 +10,7 @@ import os
 
 import pandas as pd
 import streamlit as st
+from PIL import Image
 
 from config_painel import PASTA_PAINEL_RESULTADOS, URL_IMAGENS_PAINEL
 
@@ -20,14 +21,28 @@ from config_painel import PASTA_PAINEL_RESULTADOS, URL_IMAGENS_PAINEL
 FRACAO_LARGURA_MAPA = 0.6
 
 
-def mostrar_mapa(arquivo):
+def mostrar_mapa(arquivo, largura_por_altura=None):
     """Mostra a imagem de PASTA_PAINEL_RESULTADOS numa coluna. No painel publicado (URL_IMAGENS_PAINEL definido), a imagem
-    vem do GitHub; o ?v= (data do arquivo no app) evita que o navegador ou o GitHub mostrem uma versão antiga."""
+    vem do GitHub; o ?v= (data do arquivo no app) evita que o navegador ou o GitHub mostrem uma versão antiga.
+
+    largura_por_altura: com os seletores ao lado do mapa (aba Dissimilaridade, pedido do usuário em 2026-10-17), o mapa
+    ocupa a coluna dele inteira, menos quando é mais alto que isso: a imagem fica com no máximo largura da coluna ÷
+    largura_por_altura de altura (o Centro, mais alto que largo, fica mais estreito).
+    """
+    if largura_por_altura is None:
+        fracao = FRACAO_LARGURA_MAPA
+    else:
+        with Image.open(arquivo) as imagem:
+            largura, altura = imagem.size
+        fracao = min(1.0, largura / altura / largura_por_altura)
     if URL_IMAGENS_PAINEL:
         relativo = os.path.relpath(arquivo, PASTA_PAINEL_RESULTADOS).replace(os.sep, "/")
         arquivo = f"{URL_IMAGENS_PAINEL}/{relativo}?v={int(os.path.getmtime(arquivo))}"
-    coluna, _ = st.columns([FRACAO_LARGURA_MAPA, 1 - FRACAO_LARGURA_MAPA])
-    coluna.image(arquivo, width="stretch")
+    if fracao >= 0.999:
+        st.image(arquivo, width="stretch")
+    else:
+        coluna, _ = st.columns([fracao, 1 - fracao])
+        coluna.image(arquivo, width="stretch")
 
 
 REFERENCIAS_MAPAS = {"Cenas de uso": "cenas_de_uso", "População residente": "populacao_residente",
@@ -90,20 +105,31 @@ def mostrar_tabela(nome, numero):
     st.caption("  \n".join(legendas))
 
 
-def escolher_e_mostrar_mapa(prefixo, rotulo, chave, extensao="jpg", zona=None):
-    """Escolha da referência e mapa recortado da figura composta da dissertação (ou o mapa da zona escolhida)."""
+def escolher_referencia(rotulo, chave):
+    """Seletor da referência do mapa, com o aviso das referências que não estão na dissertação."""
     conferir_pasta()
     referencia = st.radio(rotulo, list(REFERENCIAS_MAPAS), horizontal=True, key=chave)
     if referencia in FORA_DA_DISSERTACAO:
         st.info(AVISO_FORA)
+    return referencia
+
+
+def mostrar_mapa_referencia(prefixo, referencia, extensao="jpg", zona=None, largura_por_altura=None):
+    """Mapa recortado da figura composta da dissertação (ou o mapa da zona escolhida)."""
     if zona is None:
-        mostrar_mapa(caminho(f"{prefixo}_{REFERENCIAS_MAPAS[referencia]}.{extensao}"))
+        mostrar_mapa(caminho(f"{prefixo}_{REFERENCIAS_MAPAS[referencia]}.{extensao}"), largura_por_altura)
     else:
         arquivo = caminho(f"zonas/{prefixo}_{zona['slug']}_{REFERENCIAS_MAPAS[referencia]}.jpg")
         if os.path.exists(arquivo):
-            mostrar_mapa(arquivo)
+            mostrar_mapa(arquivo, largura_por_altura)
         else:
             st.info(f"{referencia}: menos de {MIN_PONTOS_ZONA} pontos {zona['em']}; o mapa e o índice não são calculados.")
+
+
+def escolher_e_mostrar_mapa(prefixo, rotulo, chave, extensao="jpg", zona=None):
+    """Escolha da referência e mapa recortado da figura composta da dissertação (ou o mapa da zona escolhida)."""
+    referencia = escolher_referencia(rotulo, chave)
+    mostrar_mapa_referencia(prefixo, referencia, extensao, zona)
     return referencia
 
 
@@ -113,10 +139,12 @@ RECORTES = ["Município", "Centro", "Zona Sul", "Zona Norte", "Zona Sudoeste", "
 MIN_PONTOS_ZONA = 5
 
 
-def escolher_zona(chave):
+def escolher_zona(chave, texto_pequeno=False):
     """Seletor do recorte no topo da aba: o município ou uma zona. A escolha passa para as outras abas.
 
     Devolve None para o município ou um dict com zona (código das tabelas), nome, slug e os totais da zona.
+    texto_pequeno: a descrição da zona em fonte menor que a do st.caption (aba Dissimilaridade, onde fica na coluna
+    estreita dos seletores; pedido do usuário em 2026-10-17).
     """
     if not os.path.exists(caminho("zonas/resumo_zonas.parquet")):
         st.caption("Recorte por zona indisponível: gere com `python painel/gera_dados_painel_zonas.py`.")
@@ -132,12 +160,18 @@ def escolher_zona(chave):
     zona = ler("zonas/resumo_zonas.parquet").set_index("nome").loc[nome].to_dict()
     zona["nome"] = nome
     zona["em"] = "no Centro" if nome == "Centro" else f"na {nome}"  # "no Centro", "na Zona Sul"
-    st.caption(
+    texto = (
         f"**{nome}:** {numero_br(zona['n_psr'], 0)} PSR, {numero_br(zona['n_cenas'], 0)} cenas de uso, "
         f"{numero_br(zona['n_bairros'], 0)} bairros e {numero_br(zona['n_celulas'], 0)} células de 1 km (recortadas "
         f"pelos limites da zona). {zona['descricao']}"
         + (" Com tão poucas cenas, os resultados das cenas na zona são frágeis." if zona["n_cenas"] < 20 else "")
     )
+    if texto_pequeno:
+        texto = texto.replace(f"**{nome}:**", f"<b>{nome}:</b>")
+        st.markdown(f'<div style="font-size: 0.72rem; line-height: 1.35; opacity: 0.65;">{texto}</div>',
+                    unsafe_allow_html=True)
+    else:
+        st.caption(texto)
     return zona
 
 

@@ -4,19 +4,28 @@
 
 import streamlit as st
 
-from resultados_comuns import escolher_e_mostrar_mapa, escolher_zona, mostrar_tabela, mostrar_tabela_zona
+from resultados_comuns import (escolher_referencia, escolher_zona, mostrar_mapa_referencia, mostrar_tabela,
+                               mostrar_tabela_zona)
 
 st.title("Índice de Dissimilaridade (D de Duncan) e Gráfico de Dissimilaridade Local")
-zona = escolher_zona("zona_dissimilaridade")
 
-# Seletor do que o mapa mostra (pedido do usuário em 2026-10-16): as bolhas da dissimilaridade local por célula ou os
-# próprios pontos de PSR e da referência (mapas de painel/gera_dados_painel_zonas.py, função mapas_pontos)
-MODOS = {"Dissimilaridade local (círculos por célula)": "dissimilaridade", "Pontos de PSR e da referência": "pontos"}
-modo = MODOS[st.radio("Mostrar no mapa", list(MODOS), horizontal=True, key="modo_mapa_dissimilaridade")]
-st.subheader(("Dissimilaridade local da PSR 2024 nas células de 1 km da Grade Estatística do IBGE" if modo == "dissimilaridade"
-              else "PSR 2024 e pontos da referência")
-             + (f", {zona['nome']}" if zona else ""))
-escolher_e_mostrar_mapa(modo, "Referência do mapa", "referencia_dissimilaridade", extensao="jpg", zona=zona)
+# Seletores à direita do mapa, para rolar menos (pedido do usuário em 2026-10-17). A coluna da direita é preenchida
+# antes, porque o título e o mapa dependem das escolhas.
+coluna_mapa, coluna_seletores = st.columns([0.68, 0.32], gap="large")
+with coluna_seletores:
+    zona = escolher_zona("zona_dissimilaridade", texto_pequeno=True)
+    # Seletor do que o mapa mostra (pedido do usuário em 2026-10-16): as bolhas da dissimilaridade local por célula ou os
+    # próprios pontos de PSR e da referência (mapas de painel/gera_dados_painel_zonas.py, função mapas_pontos)
+    MODOS = {"Dissimilaridade local (círculos por célula)": "dissimilaridade", "Pontos de PSR e da referência": "pontos"}
+    modo = MODOS[st.radio("Mostrar no mapa", list(MODOS), key="modo_mapa_dissimilaridade")]
+    referencia = escolher_referencia("Referência do mapa", "referencia_dissimilaridade")
+with coluna_mapa:
+    st.subheader(("Dissimilaridade local da PSR 2024 nas células de 1 km da Grade Estatística do IBGE"
+                  if modo == "dissimilaridade" else "PSR 2024 e pontos da referência")
+                 + (f", {zona['nome']}" if zona else ""))
+    # altura do mapa limitada a 1/1,5 da largura da coluna: o mapa do município ocupa a coluna inteira; o do Centro,
+    # mais alto que largo, fica mais estreito
+    mostrar_mapa_referencia(modo, referencia, extensao="jpg", zona=zona, largura_por_altura=1.5)
 FONTE_MAPAS = (
     "**Fonte:** Elaboração própria a partir do censo de PSR de 2024 (IPP), das cenas de uso registradas no censo, "
     "da Grade Estatística do Censo 2022 (IBGE), dos pontos de parada do SPPO (DATA.RIO; pontos de ônibus) e do OpenStreetMap "
