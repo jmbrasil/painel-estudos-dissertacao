@@ -7,7 +7,7 @@ import streamlit as st
 from resultados_comuns import (escolher_referencia, escolher_zona, mostrar_mapa_referencia, mostrar_tabela,
                                mostrar_tabela_zona)
 
-st.title("Índice de Dissimilaridade (D de Duncan) e Gráfico de Dissimilaridade Local")
+# sem st.title: o título da aba ocupava muito espaço acima do mapa (pedido do usuário em 2026-10-17)
 
 # Seletores à direita do mapa, para rolar menos (pedido do usuário em 2026-10-17). A coluna da direita é preenchida
 # antes, porque o título e o mapa dependem das escolhas.
